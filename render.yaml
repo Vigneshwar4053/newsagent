@@ -1,6 +1,11 @@
 services:
   - type: web
-    name: newsagent
+    name: news-agent
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m nltk.downloader punkt stopwords wordnet
     startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: PORT
+        value: 10000
