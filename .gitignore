@@ -1,0 +1,20 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+
+# Database files (optional: only if they are local/test databases)
+*.db
+
+# Cache files
+*.pkl
+
+# Environment files or config secrets (optional if present)
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db

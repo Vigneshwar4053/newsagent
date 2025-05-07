@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsAgent - Your Personal News Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2962ff;
+            --secondary-color: #0039cb;
+            --accent-color: #768fff;
+            --light-bg: #f5f7ff;
+            --dark-bg: #1a1a2e;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed);
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark-mode .navbar {
+            background-color: #1e1e42;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        #last-updated {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .category-btn {
+            white-space: nowrap;
+            border-radius: 20px;
+            margin: 0 4px;
+            font-size: 0.9rem;
+            transition: all var(--transition-speed);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+        }
+        
+        .category-btn.active {
+            background-color: white;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .news-card {
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            transition: transform var(--transition-speed);
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
+        
+        .dark-mode .news-card {
+            background-color: #2d2d42;
+            border: 1px solid #3e3e60;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .news-card-header {
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        
+        .dark-mode .news-card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .category-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .tag-tech {
+            background-color: #009688;
+            color: white;
+        }
+        
+        .tag-india {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .tag-global {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        .tag-stocks {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .tag-innovation {
+            background-color: #9c27b0;
+            color: white;
+        }
+        
+        .news-content {
+            padding: 15px;
+        }
+        
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+        
+        .news-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .dark-mode .news-description {
+            color: #bbb;
+        }
+        
+        .news-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+        
+        .news-actions button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-left: 10px;
+            transition: color var(--transition-speed);
+        }
+        
+        .dark-mode .news-actions button {
+            color: var(--accent-color);
+        }
+        
+        .news-actions button:hover {
+            color: var(--secondary-color);
+        }
+        
+        .source-name {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .dark-mode .source-name {
+            color: #aaa;
+        }
+        
+        .highlighted {
+            background-color: rgba(255, 235, 59, 0.3);
+            transition: background-color 0.5s ease;
+        }
+        
+        .dark-mode .highlighted {
+            background-color: rgba(255, 235, 59, 0.15);
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin: 20px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .dark-mode .section-title {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+        
+        .refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .controls-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 99;
+        }
+        
+        .dark-mode .controls-bar {
+            background-color: #1e1e42;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .dark-mode .control-btn {
+            color: #aaa;
+        }
+        
+        .control-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        
+        .control-btn.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .dark-mode .control-btn.active {
+            color: var(--accent-color);
+        }
+        
+        .saved-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #saveSuccessToast {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        /* Theme toggle */
+        .theme-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            margin-left: 10px;
+        }
+        
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        #readNewsBtn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ff5722;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        #readNewsBtn:hover {
+            background-color: #e64a19;
+            transform: scale(1.1);
+        }
+        
+        #readNewsBtn.active {
+            background-color: #4caf50;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .category-btn {
+                padding: 4px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .categories-scroller {
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                padding: 10px 0;
+                margin: 0 -12px;
+            }
+            
+            .categories-scroller .btn-group {
+                padding: 0 12px;
+            }
+            
+            .content-container {
+                padding-bottom: 70px;
+            }
+            
+            .refresh-btn {
+                bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-newspaper"></i>
+                NewsAgent
+            </span>
+            <div class="d-flex align-items-center">
+                <small id="last-updated" class="text-white me-3">Last updated: --:--</small>
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container content-container">
+        <div class="categories-scroller mt-3">
+            <div class="btn-group" role="group" aria-label="News categories">
+                <button type="button" class="category-btn active" data-category="all">All News</button>
+                <button type="button" class="category-btn" data-category="tech">Tech</button>
+                <button type="button" class="category-btn" data-category="india">India</button>
+                <button type="button" class="category-btn" data-category="global">Global</button>
+                <button type="button" class="category-btn" data-category="stocks">Stocks</button>
+                <button type="button" class="category-btn" data-category="innovation">Innovation</button>
+            </div>
+        </div>
+
+        <h2 class="section-title">Latest News</h2>
+        <div id="newsContainer" class="row">
+            <!-- News cards will be loaded here -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading news...</p>
+            </div>
+        </div>
+        
+        <div id="savedNewsContainer" class="row d-none">
+            <h2 class="section-title">Saved News</h2>
+            <div id="savedNewsItems" class="row">
+                <!-- Saved news will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Control buttons -->
+    <div class="controls-bar">
+        <a href="#" class="control-btn active" id="homeBtn">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="control-btn" id="savedBtn">
+            <i class="fas fa-bookmark"></i>
+            <span>Saved</span>
+            <span class="saved-badge d-none" id="savedCount">0</span>
+        </a>
+        <a href="#" class="control-btn" id="settingsBtn">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <!-- Floating buttons -->
+    <div class="refresh-btn" id="refreshBtn">
+        <i class="fas fa-sync-alt"></i>
+    </div>
+    
+    <div id="readNewsBtn">
+        <i class="fas fa-volume-up"></i>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="saveSuccessToast">News saved successfully!</div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            Dark Mode
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                            </div>
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Update Frequency</label>
+                        <select class="form-select" id="updateFrequency">
+                            <option value="auto">Auto (Morning, Afternoon, Evening)</option>
+                            <option value="hourly">Hourly</option>
+                            <option value="manual">Manual Only</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text-to-Speech Voice</label>
+                        <select class="form-select" id="ttsVoice">
+                            <!-- Will be populated with available voices -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Speech Rate</label>
+                        <input type="range" class="form-range" min="0.5" max="2" step="0.1" value="1" id="speechRate">
+                        <small class="text-muted d-block text-center" id="speechRateValue">1x</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveSettings">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration
+        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+        const WS_BASE_URL = window.location.hostname === 'localhost' ? 'ws://localhost:8000' : 'ws://' + window.location.host;
+        
+        // State
+        let currentCategory = 'all';
+        let newsData = {};
+        let savedNews = [];
+        let socket;
+        let speechSynthesis = window.speechSynthesis;
+        let isSpeaking = false;
+        let currentUtterance = null;
+        
+        // DOM Elements
+        const newsContainer = document.getElementById('newsContainer');
+        const savedNewsContainer = document.getElementById('savedNewsContainer');
+        const savedNewsItems = document.getElementById('savedNewsItems');
+        const savedCount = document.getElementById('savedCount');
+        const lastUpdated = document.getElementById('last-updated');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const readNewsBtn = document.getElementById('readNewsBtn');
+        const homeBtn = document.getElementById('homeBtn');
+        const savedBtn = document.getElementById('savedBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const saveSuccessToast = document.getElementById('saveSuccessToast');
+        const themeSwitch = document.getElementById('themeSwitch');
+        const darkModeSwitch = document.getElementById('darkModeSwitch');
+        const updateFrequency = document.getElementById('updateFrequency');
+        const ttsVoice = document.getElementById('ttsVoice');
+        const speechRate = document.getElementById('speechRate');
+        const speechRateValue = document.getElementById('speechRateValue');
+        const settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'));
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            socket = new WebSocket(`${WS_BASE_URL}/ws`);
+            
+            socket.onopen = function(e) {
+                console.log("WebSocket connection established");
+            };
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.event === 'news_update') {
+                    lastUpdated.textContent = `Last updated: ${data.data.message.split('at ')[1]}`;
+                    fetchNews();
+                } else if (data.event === 'news_refreshed') {
+                    newsData = data.data;
+                    renderNews();
+                    refreshBtn.classList.remove('spinning');
+                    showToast("News refreshed!");
+                } else if (data.event === 'category_news') {
+                    if (data.data.category === currentCategory) {
+                        renderCategoryNews(data.data.news);
+                    }
+                }
+            };
+            
+            socket.onclose = function(event) {
+                console.log("WebSocket connection closed");
+                // Reconnect after a delay
+                setTimeout(initWebSocket, 5000);
+            };
+            
+            socket.onerror = function(error) {
+                console.error("WebSocket error:", error);
+            };
+        }
+        
+        // Initialize the app
+        async function init() {
+            // Load settings
+            loadSettings();
+            
+            // Initialize WebSocket
+            initWebSocket();
+            
+            // Fetch news
+            await fetchNews();
+            
+            // Fetch saved news
+            await fetchSavedNews();
+            
+            // Initialize TTS voices
+            initVoices();
+            
+            // Set up event listeners
+            setupEventListeners();
+        }
+        
+        // Fetch news from the API
+        async function fetchNews() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news`);
+                newsData = await response.json();
+                renderNews();
+                updateLastUpdated();
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                newsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-circle text-danger fa-3x"></i>
+                        <p class="mt-2">Could not load news. Please try again later.</p>
+                        <button class="btn btn-primary mt-2" onClick="fetchNews()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Fetch saved news from the API
+        async function fetchSavedNews() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news/saved`);
+                savedNews = await response.json();
+                updateSavedCount();
+            } catch (error) {
+                console.error("Error fetching saved news:", error);
+            }
+        }
+        
+        // Render news based on the current category
+        function renderNews() {
+            if (currentCategory === 'all') {
+                renderAllNews();
+            } else {
+                renderCategoryNews(newsData[currentCategory]);
+            }
+        }
+        
+        // Render all news categories
+        function renderAllNews() {
+            let html = '';
+            
+            Object.keys(newsData).forEach(category => {
+                const categoryNews = newsData[category];
+                if (categoryNews && categoryNews.length > 0) {
+                    categoryNews.slice(0, 3).forEach(news => {
+                        html += createNewsCard(news);
+                    });
+                }
+            });
+            
+            if (html === '') {
+                html = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-newspaper text-muted fa-3x"></i>
+                        <p class="mt-2">No news available at the moment.</p>
+                    </div>
+                `;
+            }
+            
+            newsContainer.innerHTML = html;
+            attachNewsCardEventListeners();
+        }
+        
+        // Render news for a specific category
+        function renderCategoryNews(news) {
+            let html = '';
+            
+            if (news && news.length > 0) {
+                news.forEach(item => {
+                    html += createNewsCard(item);
+                });
+            } else {
+                html = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-newspaper text-muted fa-3x"></i>
+                        <p class="mt-2">No news available for this category.</p>
+                    </div>
+                `;
+            }
+            
+            newsContainer.innerHTML = html;
+            attachNewsCardEventListeners();
+        }
+        
+        // Render saved news
+        function renderSavedNews() {
+            let html = '';
+            
+            if (savedNews.length > 0) {
+                savedNews.forEach(news => {
+                    html += createSavedNewsCard(news);
+                });
+            } else {
+                html = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-bookmark text-muted fa-3x"></i>
+                        <p class="mt-2">You don't have any saved news yet.</p>
+                    </div>
+                `;
+            }
+            
+            savedNewsItems.innerHTML = html;
+            attachSavedNewsCardEventListeners();
+        }
+        
+        // Create a news card HTML
+        function createNewsCard(news) {
+            return `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="news-card" data-news-id="${news.title}">
+                        <div class="news-card-header">
+                            <span class="category-tag tag-${news.category}">${news.category}</span>
+                            <span class="news-date">${formatDate(news.published_date)}</span>
+                        </div>
+                        <div class="news-content">
+                            <h3 class="news-title">${news.title}</h3>
+                            <p class="news-description">${news.description || 'No description available.'}</p>
+                            <div class="news-footer">
+                                <span class="source-name">${news.source}</span>
+                                <div class="news-actions">
+                                    <button class="read-btn" title="Read aloud"><i class="fas fa-volume-up"></i></button>
+                                    <button class="save-btn" title="Save news"><i class="far fa-bookmark"></i></button>
+                                    <button class="open-btn" title="Open original" onclick="window.open('${news.url}', '_blank')"><i class="fas fa-external-link-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create a saved news card HTML
+        function createSavedNewsCard(news) {
+            return `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="news-card" data-news-id="${news.id}">
+                        <div class="news-card-header">
+                            <span class="category-tag tag-${news.category}">${news.category}</span>
+                            <span class="news-date">Saved on ${formatDate(news.saved_date)}</span>
+                        </div>
+                        <div class="news-content">
+                            <h3 class="news-title">${news.title}</h3>
+                            <p class="news-description">${news.description || 'No description available.'}</p>
+                            <div class="news-footer">
+                                <span class="source-name">${news.source}</span>
+                                <div class="news-actions">
+                                    <button class="read-btn" title="Read aloud"><i class="fas fa-volume-up"></i></button>
+                                    <button class="delete-btn" title="Delete saved news"><i class="fas fa-trash-alt"></i></button>
+                                    <button class="open-btn" title="Open original" onclick="window.open('${news.url}', '_blank')"><i class="fas fa-external-link-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    changeCategory(category);
+                });
+            });
+            
+            // Refresh button
+            refreshBtn.addEventListener('click', function() {
+                this.classList.add('spinning');
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ action: 'refresh_news' }));
+                } else {
+                    fetchNews().then(() => {
+                        refreshBtn.classList.remove('spinning');
+                    });
+                }
+            });
+            
+            // Read news button
+            readNewsBtn.addEventListener('click', function() {
+                if (isSpeaking) {
+                    stopSpeaking();
+                    this.classList.remove('active');
+                } else {
+                    this.classList.add('active');
+                    readAllNews();
+                }
+            });
+            
+            // Control buttons
+            homeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showHomeView();
+            });
+            
+            savedBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showSavedView();
+            });
+            
+            settingsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                settingsModal.show();
+            });
+            
+            // Theme switch
+            themeSwitch.addEventListener('change', function() {
+                toggleDarkMode(this.checked);
+                darkModeSwitch.checked = this.checked;
+                localStorage.setItem('darkMode', this.checked);
+            });
+            
+            // Settings form
+            darkModeSwitch.addEventListener('change', function() {
+                toggleDarkMode(this.checked);
+                themeSwitch.checked = this.checked;
+                localStorage.setItem('darkMode', this.checked);
+            });
+            
+            speechRate.addEventListener('input', function() {
+                speechRateValue.textContent = this.value + 'x';
+                localStorage.setItem('speechRate', this.value);
+            });
+            
+            document.getElementById('saveSettings').addEventListener('click', function() {
+                saveSettings();
+                settingsModal.hide();
+            });
+            
+            // Speech synthesis events
+            speechSynthesis.addEventListener('voiceschanged', function() {
+                initVoices();
+            });
+        }
+        
+        // Attach event listeners to news cards
+        function attachNewsCardEventListeners() {
+            document.querySelectorAll('.news-card .read-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const title = card.querySelector('.news-title').textContent;
+                    const description = card.querySelector('.news-description').textContent;
+                    
+                    highlightCard(card);
+                    speakText(`${title}. ${description}`);
+                });
+            });
+            
+            document.querySelectorAll('.news-card .save-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const newsId = card.dataset.newsId;
+                    
+                    // Find the news item in the data
+                    let newsItem = null;
+                    Object.keys(newsData).forEach(category => {
+                        const found = newsData[category].find(item => item.title === newsId);
+                        if (found) newsItem = found;
+                    });
+                    
+                    if (newsItem) {
+                        saveNews(newsItem);
+                    }
+                });
+            });
+        }
+        
+        // Attach event listeners to saved news cards
+        function attachSavedNewsCardEventListeners() {
+            document.querySelectorAll('#savedNewsItems .news-card .read-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const title = card.querySelector('.news-title').textContent;
+                    const description = card.querySelector('.news-description').textContent;
+                    
+                    highlightCard(card);
+                    speakText(`${title}. ${description}`);
+                });
+            });
+            
+            document.querySelectorAll('#savedNewsItems .news-card .delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const newsId = card.dataset.newsId;
+                    
+                    deleteNews(newsId);
+                });
+            });
+        }
+        
+        // Change the current category
+        function changeCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
+            });
+            
+            renderNews();
+        }
+        
+        // Show home view
+        function showHomeView() {
+            // Update active button
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            homeBtn.classList.add('active');
+            
+            // Show/hide containers
+            newsContainer.classList.remove('d-none');
+            savedNewsContainer.classList.add('d-none');
+            
+            // Update section title
+            document.querySelector('.section-title').textContent = 'Latest News';
+        }
+        
+        // Show saved news view
+        function showSavedView() {
+            // Update active button
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            savedBtn.classList.add('active');
+            
+            // Show/hide containers
+            newsContainer.classList.add('d-none');
+            savedNewsContainer.classList.remove('d-none');
+            
+            // Render saved news
+            renderSavedNews();
+        }
+        
+        // Save a news item
+        async function saveNews(newsItem) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newsItem)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    await fetchSavedNews();
+                    showToast("News saved successfully!");
+                } else {
+                    showToast("Failed to save news!");
+                }
+            } catch (error) {
+                console.error("Error saving news:", error);
+                showToast("Failed to save news!");
+            }
+        }
+        
+        // Delete a saved news item
+        async function deleteNews(newsId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/news/saved/${newsId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    await fetchSavedNews();
+                    renderSavedNews();
+                    showToast("News deleted successfully!");
+                } else {
+                    showToast("Failed to delete news!");
+                }
+            } catch (error) {
+                console.error("Error deleting news:", error);
+                showToast("Failed to delete news!");
+            }
+        }
+        
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            lastUpdated.textContent = `Last updated: ${hours}:${minutes}`;
+        }
+        
+        // Update saved count badge
+        function updateSavedCount() {
+            const count = savedNews.length;
+            savedCount.textContent = count;
+            
+            if (count > 0) {
+                savedCount.classList.remove('d-none');
+            } else {
+                savedCount.classList.add('d-none');
+            }
+        }
+        
+        // Format date string
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            
+            try {
+                const date = new Date(dateStr);
+                
+                // Check if the date is today
+                const today = new Date();
+                if (date.toDateString() === today.toDateString()) {
+                    return `Today, ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+                
+                // Check if the date is yesterday
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (date.toDateString() === yesterday.toDateString()) {
+                    return `Yesterday, ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+                
+                // Otherwise, show full date
+                return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}, ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+        
+        // Text-to-speech function
+        function speakText(text) {
+            // Stop any current speech
+            stopSpeaking();
+            
+            // Create a new utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Get selected voice
+            const selectedVoice = localStorage.getItem('ttsVoice');
+            const voices = speechSynthesis.getVoices();
+            if (selectedVoice && voices.length > 0) {
+                const voice = voices.find(v => v.name === selectedVoice);
+                if (voice) utterance.voice = voice;
+            }
+            
+            // Set speech rate
+            utterance.rate = parseFloat(localStorage.getItem('speechRate') || 1);
+            
+            // Set up event handlers
+            utterance.onend = function() {
+                isSpeaking = false;
+                readNewsBtn.classList.remove('active');
+            };
+            
+            utterance.onerror = function() {
+                isSpeaking = false;
+                readNewsBtn.classList.remove('active');
+            };
+            
+            // Start speaking
+            speechSynthesis.speak(utterance);
+            currentUtterance = utterance;
+            isSpeaking = true;
+            readNewsBtn.classList.add('active');
+        }
+        
+        // Stop speaking
+        function stopSpeaking() {
+            if (isSpeaking) {
+                speechSynthesis.cancel();
+                isSpeaking = false;
+                readNewsBtn.classList.remove('active');
+                
+                // Remove all highlights
+                document.querySelectorAll('.highlighted').forEach(el => {
+                    el.classList.remove('highlighted');
+                });
+            }
+        }
+        
+        // Read all news headlines
+        function readAllNews() {
+            const newsItems = document.querySelectorAll('.news-card:not(.d-none)');
+            if (newsItems.length === 0) return;
+            
+            let allHeadlines = '';
+            newsItems.forEach((card, index) => {
+                const title = card.querySelector('.news-title').textContent;
+                const category = card.querySelector('.category-tag').textContent;
+                allHeadlines += `News ${index + 1}: ${title}. Category: ${category}. `;
+            });
+            
+            speakText(allHeadlines);
+        }
+        
+        // Highlight a card while speaking
+        function highlightCard(card) {
+            // Remove any existing highlights
+            document.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+            
+            // Add highlight to the current card
+            card.classList.add('highlighted');
+        }
+        
+        // Show toast message
+        function showToast(message) {
+            saveSuccessToast.textContent = message;
+            saveSuccessToast.style.display = 'block';
+            
+            setTimeout(() => {
+                saveSuccessToast.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        
+        // Initialize TTS voices
+        function initVoices() {
+            const voices = speechSynthesis.getVoices();
+            
+            if (voices.length > 0) {
+                // Clear existing options
+                ttsVoice.innerHTML = '';
+                
+                // Add voices to select
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    ttsVoice.appendChild(option);
+                });
+                
+                // Set selected voice
+                const savedVoice = localStorage.getItem('ttsVoice');
+                if (savedVoice) {
+                    ttsVoice.value = savedVoice;
+                }
+            }
+        }
+        
+        // Load settings from localStorage
+        function loadSettings() {
+            // Dark mode
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            themeSwitch.checked = darkMode;
+            darkModeSwitch.checked = darkMode;
+            toggleDarkMode(darkMode);
+            
+            // Update frequency
+            const frequency = localStorage.getItem('updateFrequency');
+            if (frequency) {
+                updateFrequency.value = frequency;
+            }
+            
+            // Speech rate
+            const rate = localStorage.getItem('speechRate');
+            if (rate) {
+                speechRate.value = rate;
+                speechRateValue.textContent = rate + 'x';
+            }
+        }
+        
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('darkMode', darkModeSwitch.checked);
+            localStorage.setItem('updateFrequency', updateFrequency.value);
+            localStorage.setItem('ttsVoice', ttsVoice.value);
+            localStorage.setItem('speechRate', speechRate.value);
+            
+            showToast("Settings saved!");
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
