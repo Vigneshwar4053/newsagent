@@ -552,8 +552,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
         // Configuration
-        const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
-        const WS_BASE_URL = window.location.hostname === 'localhost' ? 'ws://localhost:8000' : 'ws://' + window.location.host;
+        
+// Configuration
+const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+const WS_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'ws://localhost:8000' 
+    : 'wss://' + window.location.host;
         
         // State
         let currentCategory = 'all';
@@ -586,41 +590,40 @@
         
         // Initialize WebSocket connection
         function initWebSocket() {
-            socket = new WebSocket(`${WS_BASE_URL}/ws`);
-            
-            socket.onopen = function(e) {
-                console.log("WebSocket connection established");
-            };
-            
-            socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                
-                if (data.event === 'news_update') {
-                    lastUpdated.textContent = `Last updated: ${data.data.message.split('at ')[1]}`;
-                    fetchNews();
-                } else if (data.event === 'news_refreshed') {
-                    newsData = data.data;
-                    renderNews();
-                    refreshBtn.classList.remove('spinning');
-                    showToast("News refreshed!");
-                } else if (data.event === 'category_news') {
-                    if (data.data.category === currentCategory) {
-                        renderCategoryNews(data.data.news);
-                    }
-                }
-            };
-            
-            socket.onclose = function(event) {
-                console.log("WebSocket connection closed");
-                // Reconnect after a delay
-                setTimeout(initWebSocket, 5000);
-            };
-            
-            socket.onerror = function(error) {
-                console.error("WebSocket error:", error);
-            };
-        }
+    socket = new WebSocket(`${WS_BASE_URL}/ws`);
+    
+    socket.onopen = function(e) {
+        console.log("WebSocket connection established");
+    };
+    
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
         
+        if (data.event === 'news_update') {
+            lastUpdated.textContent = `Last updated: ${data.data.message.split('at ')[1]}`;
+            fetchNews();
+        } else if (data.event === 'news_refreshed') {
+            newsData = data.data;
+            renderNews();
+            refreshBtn.classList.remove('spinning');
+            showToast("News refreshed!");
+        } else if (data.event === 'category_news') {
+            if (data.data.category === currentCategory) {
+                renderCategoryNews(data.data.news);
+            }
+        }
+    };
+    
+    socket.onclose = function(event) {
+        console.log("WebSocket connection closed");
+        // Reconnect after a delay
+        setTimeout(initWebSocket, 5000);
+    };
+    
+    socket.onerror = function(error) {
+        console.error("WebSocket error:", error);
+    };
+}
         // Initialize the app
         async function init() {
             // Load settings
